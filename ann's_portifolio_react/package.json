@@ -2,7 +2,7 @@
   "name": "portfolio",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://annamariam.github.io/React_portfolio_app",
+  "homepage": "https://a-kum2580.github.io/Portfolio_react_app",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
