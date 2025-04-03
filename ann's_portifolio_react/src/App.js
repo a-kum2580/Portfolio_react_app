@@ -7,6 +7,7 @@ import PersonalDetails from './components/personalDetails';
 import Profile from './components/profile';
 import LinkNavigation from './components/linkNavigation';
 import ResultComponent from './components/ResultComponent';
+import ManageResults from './components/ManageResults';
 import { RESULTS } from './util/ResultsData';
 import Login from './components/Login';
 import './App.css';
@@ -14,6 +15,7 @@ import './App.css';
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [results, setResults] = useState(RESULTS);
 
   useEffect(() => {
     // Check for saved preference on mount
@@ -22,6 +24,12 @@ function App() {
       document.body.classList.add('dark-mode');
     } else {
       document.body.classList.remove('dark-mode');
+    }
+
+    // Load saved results from localStorage if they exist
+    const savedResults = localStorage.getItem('results');
+    if (savedResults) {
+      setResults(JSON.parse(savedResults));
     }
   }, []);
 
@@ -36,6 +44,11 @@ function App() {
       document.body.classList.remove('dark-mode');
       localStorage.setItem('darkMode', 'disabled');
     }
+  };
+
+  const handleUpdateResults = (updatedResults) => {
+    setResults(updatedResults);
+    localStorage.setItem('results', JSON.stringify(updatedResults));
   };
 
   if (!isLoggedIn) {
@@ -71,7 +84,9 @@ function App() {
       <hr />
       <HobbyVideo />
       <hr />
-      <ResultComponent results={RESULTS} />
+      <ResultComponent results={results} />
+      <hr />
+      <ManageResults results={results} onUpdateResults={handleUpdateResults} />
       <hr />
       <LinkNavigation />
       <hr />
