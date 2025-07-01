@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 function Login({ onLogin }) {
   const [password, setPassword] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
+  const correctPassword = "anna"; // Correct password
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (password === 'anna') {
+    if (password === correctPassword) {
       onLogin(true);
     } else {
       alert('Incorrect password');
@@ -28,10 +30,15 @@ function Login({ onLogin }) {
           />
           <button type="submit">Login</button>
         </form>
-        {!isTyping && <div className="password-hint">anna</div>}
+        {!isTyping && (
+          <div className="password-hint">
+           a
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export default Login; 
+export default Login;
+
