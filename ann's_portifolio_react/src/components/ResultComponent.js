@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
-import { RESULTS } from "../util/ResultsData";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function ResultComponent() {
+function ResultComponent({ results }) {
   const [selectedYear, setSelectedYear] = useState('year1');
   const [selectedSemester, setSelectedSemester] = useState('semester1');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Ensure selected semester is valid for the selected year
+    if (results && results[selectedYear] && !results[selectedYear][selectedSemester]) {
+      setSelectedSemester(Object.keys(results[selectedYear])[0] || 'semester1');
+    }
+  }, [selectedYear, results]);
 
   const renderResultsTable = (results) => {
     if (!results || results.length === 0) {
@@ -38,19 +46,27 @@ function ResultComponent() {
     <div className="results-container">
       <div className="results-controls">
         <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
-          <option value="year1">Year 1</option>
-          <option value="year2">Year 2</option>
+          {Object.keys(results).map((year) => (
+            <option key={year} value={year}>
+              {year.replace('year', 'Year ')}
+            </option>
+          ))}
         </select>
-        {selectedYear === 'year1' && (
+        {results[selectedYear] && (
           <select value={selectedSemester} onChange={(e) => setSelectedSemester(e.target.value)}>
-            <option value="semester1">Semester 1</option>
-            <option value="semester2">Semester 2</option>
+            {Object.keys(results[selectedYear]).map((semester) => (
+              <option key={semester} value={semester}>
+                {semester.replace('semester', 'Semester ')}
+              </option>
+            ))}
           </select>
         )}
       </div>
 
       <h2>{selectedYear.toUpperCase()} {selectedSemester.toUpperCase()} RESULTS</h2>
-      {renderResultsTable(RESULTS[selectedYear][selectedSemester])}
+      {results[selectedYear] && results[selectedYear][selectedSemester]
+        ? renderResultsTable(results[selectedYear][selectedSemester])
+        : <p>No results available for this semester.</p>}
     </div>
   );
 }
