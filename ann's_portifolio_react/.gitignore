@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 *.swp
 *.swo
+node_modules 
+cookies.txt

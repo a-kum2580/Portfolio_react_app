@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const ManageResults = ({ results, onUpdateResults }) => {
+function ManageResults() {
   const [newResult, setNewResult] = useState({
     course_code: '',
     course_title: '',
@@ -9,25 +10,32 @@ const ManageResults = ({ results, onUpdateResults }) => {
   });
   const [year, setYear] = useState('year1');
   const [semester, setSemester] = useState('semester1');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedResults = { ...results };
-    const newId = updatedResults[year][semester].length + 1;
-    
-    updatedResults[year][semester].push({
-      id: newId,
-      ...newResult
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await fetch(`/api/results/${year}/${semester}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newResult),
+      credentials: 'include'
     });
-
-    onUpdateResults(updatedResults);
-    setNewResult({
-      course_code: '',
-      course_title: '',
-      grade: '',
-      credit_units: ''
-    });
-  };
+    if (response.status === 401) {
+      navigate('/login');
+      return;
+    }
+    const data = await response.json();
+    if (data.success) {
+      setNewResult({ course_code: '', course_title: '', grade: '', credit_units: '' });
+    } else {
+      setError('Error adding result');
+    }
+  } catch (err) {
+    setError('Error connecting to server');
+  }
+};
 
   return (
     <div className="manage-results">
@@ -55,7 +63,7 @@ const ManageResults = ({ results, onUpdateResults }) => {
           <input
             type="text"
             value={newResult.course_code}
-            onChange={(e) => setNewResult({...newResult, course_code: e.target.value})}
+            onChange={(e) => setNewResult({ ...newResult, course_code: e.target.value })}
             required
           />
         </div>
@@ -65,7 +73,7 @@ const ManageResults = ({ results, onUpdateResults }) => {
           <input
             type="text"
             value={newResult.course_title}
-            onChange={(e) => setNewResult({...newResult, course_title: e.target.value})}
+            onChange={(e) => setNewResult({ ...newResult, course_title: e.target.value })}
             required
           />
         </div>
@@ -75,7 +83,7 @@ const ManageResults = ({ results, onUpdateResults }) => {
           <input
             type="text"
             value={newResult.grade}
-            onChange={(e) => setNewResult({...newResult, grade: e.target.value})}
+            onChange={(e) => setNewResult({ ...newResult, grade: e.target.value })}
             required
           />
         </div>
@@ -85,15 +93,23 @@ const ManageResults = ({ results, onUpdateResults }) => {
           <input
             type="number"
             value={newResult.credit_units}
-            onChange={(e) => setNewResult({...newResult, credit_units: e.target.value})}
+            onChange={(e) => setNewResult({ ...newResult, credit_units: e.target.value })}
             required
           />
         </div>
 
         <button type="submit">Add Result</button>
       </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <button onClick={async () => {
+     await fetch('/api/logout', {
+      method: 'POST',
+      credentials: 'include'
+  });
+  navigate('/login');
+}}>Logout</button>
     </div>
   );
-};
+}
 
-export default ManageResults; 
+export default ManageResults;

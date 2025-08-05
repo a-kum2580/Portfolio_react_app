@@ -1,20 +1,32 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login({ onLogin }) {
   const [password, setPassword] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const correctPassword = "anna"; // Correct password
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (password === correctPassword) {
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+      credentials: 'include'
+    });
+    const data = await response.json();
+    if (data.success) {
       onLogin(true);
+      navigate('/'); // Changed from '/manage-results'
     } else {
-      alert('Incorrect password');
+      setError('Incorrect password');
     }
-  };
-
+  } catch (err) {
+    setError('Error connecting to server');
+  }
+};
   return (
     <div className="login-container">
       <div className="login-form">
@@ -30,9 +42,10 @@ function Login({ onLogin }) {
           />
           <button type="submit">Login</button>
         </form>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         {!isTyping && (
           <div className="password-hint">
-           a
+            a
           </div>
         )}
       </div>
@@ -41,4 +54,3 @@ function Login({ onLogin }) {
 }
 
 export default Login;
-
