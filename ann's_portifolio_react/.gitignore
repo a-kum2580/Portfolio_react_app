@@ -24,4 +24,5 @@ yarn-error.log*
 *.swp
 *.swo
 node_modules 
+cookies.txtnode_modules/
 cookies.txt
